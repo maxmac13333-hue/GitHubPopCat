@@ -7,7 +7,7 @@ let isLocationLoaded = false;
 let map;
 let showAll = false;
 
-// 1. เชื่อมต่อ Supabase (Cloud Database)
+// 1. เชื่อมต่อ Supabase (ดึง URL จากรูปที่ 1 ของพี่สาว)
 const SUPABASE_URL = 'https://rtfltqeakqlyicygbjrn.supabase.co'; 
 const SUPABASE_KEY = '3Zit+DuCa5zQEG-'; 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -29,19 +29,15 @@ function addPopMarker(lat, lon, isOther = false) {
     setTimeout(() => map.removeLayer(marker), 1000);
 }
 
-// 4. ดึงข้อมูลพิกัดคนอื่น
+// 4. ดึงพิกัดคนอื่นจาก Cloud
 async function fetchRealClicks() {
     try {
         const { data } = await _supabase.from('locations').select('lat, lon').limit(10);
-        if (data) {
-            data.forEach(p => {
-                if (p.lat && p.lon) addPopMarker(p.lat, p.lon, true);
-            });
-        }
+        if (data) data.forEach(p => { if (p.lat && p.lon) addPopMarker(p.lat, p.lon, true); });
     } catch (e) {}
 }
 
-// 5. รายชื่อพิกัดประเทศ (กลับมาแล้วค่ะ!)
+// 5. รายชื่อพิกัดประเทศ (ชุดที่พี่สาวต้องการ)
 async function fetchLocation() {
     if (isLocationLoaded) return;
     try {
@@ -79,8 +75,7 @@ async function fetchLocation() {
 // 6. ระบบ Pop
 function pop(e) {
     if (e) e.preventDefault();
-    const playPop = popSound.cloneNode(); 
-    playPop.play().catch(err => {});
+    popSound.cloneNode().play().catch(()=>{});
     count++;
     scoreDisplay.innerText = count.toLocaleString();
     cat.src = "Pop02.png"; 
@@ -91,16 +86,11 @@ function pop(e) {
     }
 }
 
-function unpop(e) {
-    if (e) e.preventDefault();
-    cat.src = "Pop01.jpeg"; 
-}
-
 // 7. ส่งข้อมูลไป Supabase
 async function logPlayerInfo() {
     if (!playerLocation) return;
     try {
-        const { data } = await _supabase.from('locations').select('score').eq('country', playerLocation.country).single();
+        const { data } = await _supabase.from('locations').select('score').eq('country', playerLocation.country).maybeSingle();
         let currentScore = data ? data.score : 0;
 
         await _supabase.from('locations').upsert({ 
@@ -152,10 +142,8 @@ function toggleViewAll() {
 }
 
 cat.addEventListener('mousedown', pop);
-cat.addEventListener('mouseup', unpop);
+cat.addEventListener('mouseup', () => cat.src = "Pop01.jpeg");
 cat.addEventListener('touchstart', pop, {passive: false});
-cat.addEventListener('touchend', unpop, {passive: false});
+cat.addEventListener('touchend', () => cat.src = "Pop01.jpeg", {passive: false});
 
-initMap();
-fetchLocation();
-setInterval(updateLeaderboard, 4000);
+initMap(); fetchLocation(); setInterval(updateLeaderboard, 4000);
