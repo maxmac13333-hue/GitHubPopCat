@@ -9,7 +9,7 @@ let showAll = false;
 
 // 1. เชื่อมต่อ Supabase (Cloud Database)
 const SUPABASE_URL = 'https://rtfltqeakqlyicygbjrn.supabase.co'; 
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0Zmx0cWVha3FseWljeWdianJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNzA2NTksImV4cCI6MjA4ODY0NjY1OX0.OBCd3GW9TMqSzWWhGDpmQeypn8OnrhXzbGtbpKNwMyg'; 
+const SUPABASE_KEY = '3Zit+DuCa5zQEG-'; 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // 2. เริ่มต้นแผนที่
@@ -159,4 +159,3 @@ cat.addEventListener('touchend', unpop, {passive: false});
 initMap();
 fetchLocation();
 setInterval(updateLeaderboard, 4000);
-
