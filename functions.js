@@ -8,7 +8,7 @@ let map;
 let showAll = false;
 
 // 1. เชื่อมต่อ Supabase (ดึง URL จากรูปที่ 1 ของพี่สาว)
-const SUPABASE_URL = 'sb_publishable_sW4vQ_mkLseT_BbRA3etgQ_Ssohyth-'; 
+const SUPABASE_URL = 'https://rtfltqeakqlyicygbjrn.supabase.co'; 
 const SUPABASE_KEY = '3Zit+DuCa5zQEG-'; 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -147,4 +147,5 @@ cat.addEventListener('touchstart', pop, {passive: false});
 cat.addEventListener('touchend', () => cat.src = "Pop01.jpeg", {passive: false});
 
 initMap(); fetchLocation(); setInterval(updateLeaderboard, 4000);
+
 
