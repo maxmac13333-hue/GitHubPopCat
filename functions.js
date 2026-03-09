@@ -159,3 +159,4 @@ cat.addEventListener('touchend', unpop, {passive: false});
 initMap();
 fetchLocation();
 setInterval(updateLeaderboard, 4000);
+
