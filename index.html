@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PopCat World War - Full Screen Cat Edition</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div id="ip-display">🌐 กำลังโหลดข้อมูล...</div>
+
+    <audio id="pop-sound" src="pop.mp3" preload="auto"></audio>
+
+    <div id="leaderboard-box">
+        <div id="map-wrapper">
+            <div id="map"></div>
+            </div>
+
+        <h3>🏆 Global Ranking</h3>
+        <div id="leaderboard-list">กำลังโหลดอันดับ...</div>
+        
+        <button class="view-all-btn" onclick="toggleViewAll()">ดูอันดับทั้งหมด ▽</button>
+        <div id="my-rank-box">กำลังตรวจสอบอันดับของคุณ...</div>
+    </div>
+
+    <div class="header">
+        <h1>PopCat World War</h1>
+        <div id="score">0</div>
+    </div>
+
+    <div class="cat-container">
+        <img id="cat" src="Pop01.jpeg" alt="Cat">
+    </div>
+    
+    <script src="functions.js"></script>
+</body>
+</html>
