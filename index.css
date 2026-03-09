@@ -1,58 +1,130 @@
-/* --- ส่วนที่แก้ไขเพิ่มเติ่ม --- */
-
+/* 🚩 พื้นฐาน: ใช้หน่วย % และ vh/vw เพื่อความยืดหยุ่น */
 body { 
-    margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; 
+    margin: 0; padding: 0; 
+    display: flex; flex-direction: column; align-items: center; 
     background-color: #bfa482; font-family: 'Arial Black', sans-serif; 
     user-select: none; overflow: hidden; touch-action: manipulation; 
-    height: 100vh; width: 100vw; /* ล็อกความกว้างไว้ด้วย */
+    height: 100vh; width: 100vw;
 }
 
+/* 🚩 กล่อง Sidebar ซ้าย: ปรับให้กว้างตามขนาดจอแต่มีขีดจำกัด */
 #leaderboard-box { 
-    position: absolute; top: 20px; left: 20px; 
-    width: 25%; /* ใช้ % แทน px เพื่อให้ยืดหยุ่น */
-    min-width: 320px; /* แต่ไม่ให้แคบเกินไปจนอ่านไม่ออก */
-    max-width: 460px; /* และไม่กว้างเกินไปบนจอคอมยักษ์ */
-    max-height: 90vh; /* กันกล่องทะลุขอบล่างของจอ */
-    background: rgba(0,0,0,0.9); color: white; padding: 20px; border-radius: 25px;
-    z-index: 100; border: 4px solid gold; box-shadow: 0 0 30px rgba(255, 215, 0, 0.5); 
+    position: absolute; 
+    top: 20px; left: 20px; 
+    width: 28%;           /* ใช้ % เพื่อให้ยืดหยุ่นตามจอ */
+    min-width: 320px;     /* ไม่ให้แคบจนอ่านไม่ออก */
+    max-width: 460px;     /* ไม่ให้กว้างเกินไปบนจอใหญ่ */
+    max-height: 90vh;     /* กันกล่องยาวทะลุขอบล่าง */
+    background: rgba(0,0,0,0.9); color: white; 
+    padding: 20px; border-radius: 25px;
+    z-index: 100; border: 4px solid gold; 
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.5); 
     display: flex; flex-direction: column;
 }
 
-/* ปรับส่วนหัวคะแนนให้ขยับตาม Leaderboard */
+#map-wrapper { width: 100%; margin-bottom: 15px; }
+#map { width: 100%; height: 200px; border-radius: 15px; border: 2.5px solid gold; }
+
+#leaderboard-box h3 { 
+    margin: 10px 0; text-align: center; color: gold; 
+    font-size: clamp(20px, 2.5vw, 32px); /* ปรับขนาดฟอนต์อัตโนมัติตามความกว้างจอ */
+    text-transform: uppercase;
+}
+
+/* 🚩 รายชื่อประเทศ: ใช้ clamp ช่วยคุมขนาดฟอนต์ */
+#leaderboard-list {
+    flex-grow: 1; /* ให้ยืดเต็มพื้นที่ที่เหลือในกล่อง */
+    overflow-y: auto; 
+    font-family: 'Arial', sans-serif; 
+    font-size: clamp(16px, 1.8vw, 24px); 
+    padding-right: 10px;
+}
+
+#leaderboard-list::-webkit-scrollbar { width: 8px; }
+#leaderboard-list::-webkit-scrollbar-thumb { 
+    background: gold; border-radius: 10px; 
+}
+
+.rank-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.rank-score { 
+    color: #00ff00; font-family: 'Courier New', monospace; 
+    font-weight: bold; font-size: 0.9em; 
+}
+
+.view-all-btn {
+    background: gold; border: none; color: black; padding: 12px; 
+    cursor: pointer; font-size: 16px; font-weight: bold; 
+    margin: 10px 0; border-radius: 12px;
+}
+
+#my-rank-box {
+    border-top: 3px solid gold; background: rgba(255, 215, 0, 0.2); 
+    margin: 0 -20px -20px -20px; 
+    padding: 15px 20px; font-size: 1.1em;
+    border-radius: 0 0 22px 22px;
+}
+
+/* 🚩 ส่วนหัวคะแนน: จัดวางใหม่ให้รองรับจอเล็ก */
 .header { 
     margin-top: 5vh; text-align: center; width: 100%; 
-    padding-left: 0; /* รีเซ็ต padding */
-    position: relative;
-    z-index: 10;
+    z-index: 10; pointer-events: none; /* เพื่อให้คลิกทะลุไปหาแมวได้ */
 }
 
-/* 🚩 Media Queries สำหรับหน้าจอมือถือ (เล็กกว่า 768px) */
+h1 { font-size: clamp(24px, 5vw, 50px); color: white; -webkit-text-stroke: 1.5px black; margin: 0; }
+#score { 
+    font-size: clamp(60px, 12vw, 130px); 
+    color: white; -webkit-text-stroke: 2.5px black; 
+    filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
+}
+
+/* 🚩 น้องแมว */
+.cat-container { 
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+    display: flex; justify-content: center; align-items: flex-end; z-index: 1;
+}
+#cat { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
+
+/* 🚩 IP Display */
+#ip-display {
+    position: absolute; top: 20px; right: 20px; 
+    background: rgba(0,0,0,0.85); color: #00ff00; 
+    padding: 10px 20px; border-radius: 50px; 
+    font-size: clamp(14px, 1.5vw, 22px);
+    border: 2px solid #00ff00; z-index: 1000; 
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Courier New', monospace;
+}
+
+/* 📱 ปรับแต่งพิเศษสำหรับหน้าจอขนาดเล็ก (Mobile) */
+@media screen and (max-width: 1024px) {
+    /* จอ Tablet/Mobile: ย้าย Header มาไว้ตรงกลาง ไม่ต้อง Padding หลบกล่อง */
+    .header { padding-left: 0; }
+}
+
 @media screen and (max-width: 768px) {
     #leaderboard-box {
-        width: 90%; /* บนมือถือให้เกือบเต็มจอ */
-        left: 5%; /* จัดให้อยู่กลาง */
-        top: 10px;
-        max-height: 40vh; /* ลดความสูงลงเพื่อโชว์แมว */
+        position: relative; /* เปลี่ยนเป็นตำแหน่งปกติ */
+        top: 10px; left: 0;
+        width: 90%; max-height: 35vh; /* ลดความสูงเพื่อโชว์แมว */
+        margin-bottom: 10px;
     }
-
-    #leaderboard-list {
-        height: 150px; /* ลดพื้นที่รายการลง */
-        font-size: 18px; /* ปรับขนาดฟอนต์ให้พอดีมือถือ */
-    }
+    
+    #map { height: 120px; } /* ลดขนาดแผนที่บนมือถือ */
 
     #ip-display {
-        top: auto; bottom: 20px; right: 20px; /* ย้าย IP ลงล่างเพื่อไม่ให้บัง Leaderboard */
-        font-size: 16px;
-        padding: 10px 15px;
+        top: auto; bottom: 15px; right: 50%;
+        transform: translateX(50%); /* จัดวางกลางล่างบนมือถือ */
+        white-space: nowrap;
     }
-
-    h1 { font-size: 30px; }
-    #score { font-size: 80px; } /* ลดขนาดตัวเลขคะแนนหลัก */
+    
+    .cat-container { align-items: center; } /* ขยับแมวขึ้นมานิดนึง */
 }
 
-/* 🚩 สำหรับหน้าจอ Tablet (ขยับคะแนนหลบกล่องซ้าย) */
-@media screen and (min-width: 769px) {
-    .header {
-        padding-left: 460px; /* ใช้ค่าเดิมที่คุณตั้งไว้สำหรับจอใหญ่ */
-    }
+/* 🖥️ ปรับแต่งพิเศษสำหรับหน้าจอคอมพิวเตอร์ (Desktop) */
+@media screen and (min-width: 1025px) {
+    .header { padding-left: 480px; } /* ดันคะแนนไปทางขวาเพื่อให้ไม่โดนกล่องบัง */
 }
