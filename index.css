@@ -1,130 +1,95 @@
-/* 🚩 พื้นฐาน: ใช้หน่วย % และ vh/vw เพื่อความยืดหยุ่น */
 body { 
-    margin: 0; padding: 0; 
-    display: flex; flex-direction: column; align-items: center; 
+    margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; 
     background-color: #bfa482; font-family: 'Arial Black', sans-serif; 
-    user-select: none; overflow: hidden; touch-action: manipulation; 
-    height: 100vh; width: 100vw;
+    user-select: none; overflow: hidden; touch-action: manipulation; height: 100vh; 
 }
 
-/* 🚩 กล่อง Sidebar ซ้าย: ปรับให้กว้างตามขนาดจอแต่มีขีดจำกัด */
+/* 🚩 กล่อง Sidebar ซ้าย - ขยายกว้างขึ้นนิดหน่อยรองรับตัวหนังสือใหญ่ */
 #leaderboard-box { 
-    position: absolute; 
-    top: 20px; left: 20px; 
-    width: 28%;           /* ใช้ % เพื่อให้ยืดหยุ่นตามจอ */
-    min-width: 320px;     /* ไม่ให้แคบจนอ่านไม่ออก */
-    max-width: 460px;     /* ไม่ให้กว้างเกินไปบนจอใหญ่ */
-    max-height: 90vh;     /* กันกล่องยาวทะลุขอบล่าง */
-    background: rgba(0,0,0,0.9); color: white; 
-    padding: 20px; border-radius: 25px;
-    z-index: 100; border: 4px solid gold; 
-    box-shadow: 0 0 30px rgba(255, 215, 0, 0.5); 
+    position: absolute; top: 20px; left: 20px; 
+    width: 460px; /* 👈 ขยายจาก 400px เป็น 460px */
+    background: rgba(0,0,0,0.9); color: white; padding: 25px; border-radius: 25px;
+    z-index: 100; border: 4px solid gold; box-shadow: 0 0 30px rgba(255, 215, 0, 0.5); 
     display: flex; flex-direction: column;
 }
 
-#map-wrapper { width: 100%; margin-bottom: 15px; }
-#map { width: 100%; height: 200px; border-radius: 15px; border: 2.5px solid gold; }
+#map-wrapper { width: 100%; margin-bottom: 20px; }
+#map { width: 100%; height: 320px; border-radius: 15px; border: 2.5px solid gold; }
 
+/* หัวข้อ Ranking ใหญ่ขึ้น */
 #leaderboard-box h3 { 
-    margin: 10px 0; text-align: center; color: gold; 
-    font-size: clamp(20px, 2.5vw, 32px); /* ปรับขนาดฟอนต์อัตโนมัติตามความกว้างจอ */
+    margin: 15px 0; text-align: center; color: gold; 
+    font-size: 32px; /* 👈 ใหญ่ขึ้นชัดเจน */
     text-transform: uppercase;
 }
 
-/* 🚩 รายชื่อประเทศ: ใช้ clamp ช่วยคุมขนาดฟอนต์ */
+/* 🚩 รายชื่อประเทศในตาราง - ขยายใหญ่สะใจ */
 #leaderboard-list {
-    flex-grow: 1; /* ให้ยืดเต็มพื้นที่ที่เหลือในกล่อง */
-    overflow-y: auto; 
+    height: 550px; overflow-y: hidden; 
     font-family: 'Arial', sans-serif; 
-    font-size: clamp(16px, 1.8vw, 24px); 
-    padding-right: 10px;
+    font-size: 26px; /* 👈 จาก 16px เป็น 26px อ่านง่ายสุดๆ */
+    scrollbar-gutter: stable; padding-right: 15px; box-sizing: border-box;
 }
+.show-scrollbar { overflow-y: auto !important; }
 
-#leaderboard-list::-webkit-scrollbar { width: 8px; }
+/* ลูกเลื่อนทอง */
+#leaderboard-list::-webkit-scrollbar { width: 12px; }
 #leaderboard-list::-webkit-scrollbar-thumb { 
-    background: gold; border-radius: 10px; 
+    background: gold; border-radius: 10px; border: 2px solid transparent; background-clip: padding-box; 
 }
 
 .rank-row {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 12px 0; border-bottom: 2px solid rgba(255,255,255,0.1);
 }
 
+/* 🚩 ตัวเลขคะแนนสีเขียว */
 .rank-score { 
     color: #00ff00; font-family: 'Courier New', monospace; 
-    font-weight: bold; font-size: 0.9em; 
+    font-weight: bold; font-size: 24px; /* 👈 ขยายตัวเลขคะแนน */
 }
 
+/* 🚩 ปุ่มดูทั้งหมด */
 .view-all-btn {
-    background: gold; border: none; color: black; padding: 12px; 
-    cursor: pointer; font-size: 16px; font-weight: bold; 
-    margin: 10px 0; border-radius: 12px;
+    background: gold; border: none; color: black; padding: 15px; 
+    cursor: pointer; font-size: 18px; font-weight: bold; margin: 15px 0; border-radius: 12px;
 }
 
+/* 🚩 กล่อง "อันดับของคุณ" ด้านล่าง */
 #my-rank-box {
-    border-top: 3px solid gold; background: rgba(255, 215, 0, 0.2); 
-    margin: 0 -20px -20px -20px; 
-    padding: 15px 20px; font-size: 1.1em;
-    border-radius: 0 0 22px 22px;
+    border-top: 4px solid gold; background: rgba(255, 215, 0, 0.3); 
+    border-radius: 0 0 25px 25px; margin: 0 -25px -25px -25px; 
+    padding: 20px 25px; font-size: 24px; /* 👈 อันดับเราก็ต้องใหญ่ */
 }
 
-/* 🚩 ส่วนหัวคะแนน: จัดวางใหม่ให้รองรับจอเล็ก */
+/* 🚩 ส่วนหัว (คะแนนหลัก) */
 .header { 
     margin-top: 5vh; text-align: center; width: 100%; 
-    z-index: 10; pointer-events: none; /* เพื่อให้คลิกทะลุไปหาแมวได้ */
+    padding-left: 480px; /* 👈 ขยับหลบกล่องซ้ายที่กว้างขึ้น */
+    box-sizing: border-box; z-index: 10;
 }
-
-h1 { font-size: clamp(24px, 5vw, 50px); color: white; -webkit-text-stroke: 1.5px black; margin: 0; }
+h1 { font-size: 50px; color: white; -webkit-text-stroke: 2px black; margin: 0; }
 #score { 
-    font-size: clamp(60px, 12vw, 130px); 
-    color: white; -webkit-text-stroke: 2.5px black; 
+    font-size: 130px; /* 👈 ตัวเลขคะแนนใหญ่ยักษ์ */
+    color: white; -webkit-text-stroke: 3px black; 
     filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
 }
 
-/* 🚩 น้องแมว */
+/* 🚩 น้องแมวเต็มจอ */
 .cat-container { 
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
     display: flex; justify-content: center; align-items: flex-end; z-index: 1;
 }
 #cat { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
 
-/* 🚩 IP Display */
+/* 🚩 IP Display ขวาบน (ธง + ชื่อประเทศ + IP) - ขยายใหญ่พิเศษ */
 #ip-display {
-    position: absolute; top: 20px; right: 20px; 
+    position: absolute; top: 20px; right: 30px; 
     background: rgba(0,0,0,0.85); color: #00ff00; 
-    padding: 10px 20px; border-radius: 50px; 
-    font-size: clamp(14px, 1.5vw, 22px);
-    border: 2px solid #00ff00; z-index: 1000; 
-    display: flex; align-items: center; gap: 10px;
-    font-family: 'Courier New', monospace;
-}
-
-/* 📱 ปรับแต่งพิเศษสำหรับหน้าจอขนาดเล็ก (Mobile) */
-@media screen and (max-width: 1024px) {
-    /* จอ Tablet/Mobile: ย้าย Header มาไว้ตรงกลาง ไม่ต้อง Padding หลบกล่อง */
-    .header { padding-left: 0; }
-}
-
-@media screen and (max-width: 768px) {
-    #leaderboard-box {
-        position: relative; /* เปลี่ยนเป็นตำแหน่งปกติ */
-        top: 10px; left: 0;
-        width: 90%; max-height: 35vh; /* ลดความสูงเพื่อโชว์แมว */
-        margin-bottom: 10px;
-    }
-    
-    #map { height: 120px; } /* ลดขนาดแผนที่บนมือถือ */
-
-    #ip-display {
-        top: auto; bottom: 15px; right: 50%;
-        transform: translateX(50%); /* จัดวางกลางล่างบนมือถือ */
-        white-space: nowrap;
-    }
-    
-    .cat-container { align-items: center; } /* ขยับแมวขึ้นมานิดนึง */
-}
-
-/* 🖥️ ปรับแต่งพิเศษสำหรับหน้าจอคอมพิวเตอร์ (Desktop) */
-@media screen and (min-width: 1025px) {
-    .header { padding-left: 480px; } /* ดันคะแนนไปทางขวาเพื่อให้ไม่โดนกล่องบัง */
+    padding: 15px 25px; border-radius: 50px; 
+    font-size: 24px; /* 👈 ใหญ่มาก เห็นชัดถึงหน้าปากซอย */
+    border: 3px solid #00ff00; z-index: 1000; 
+    display: flex; align-items: center; gap: 15px;
+    font-family: 'Courier New', monospace; font-weight: bold;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
 }
