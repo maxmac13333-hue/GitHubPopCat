@@ -7,7 +7,7 @@ let isLocationLoaded = false;
 let map;
 let showAll = false;
 
-// 1. เชื่อมต่อ Supabase (ดึง URL จากรูปที่ 1 ของพี่สาว)
+// 1. เชื่อมต่อ Supabase (Cloud Database)
 const SUPABASE_URL = 'https://rtfltqeakqlyicygbjrn.supabase.co'; 
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0Zmx0cWVha3FseWljeWdianJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNzA2NTksImV4cCI6MjA4ODY0NjY1OX0.OBCd3GW9TMqSzWWhGDpmQeypn8OnrhXzbGtbpKNwMyg'; 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -29,15 +29,19 @@ function addPopMarker(lat, lon, isOther = false) {
     setTimeout(() => map.removeLayer(marker), 1000);
 }
 
-// 4. ดึงพิกัดคนอื่นจาก Cloud
+// 4. ดึงข้อมูลพิกัดคนอื่น
 async function fetchRealClicks() {
     try {
         const { data } = await _supabase.from('locations').select('lat, lon').limit(10);
-        if (data) data.forEach(p => { if (p.lat && p.lon) addPopMarker(p.lat, p.lon, true); });
+        if (data) {
+            data.forEach(p => {
+                if (p.lat && p.lon) addPopMarker(p.lat, p.lon, true);
+            });
+        }
     } catch (e) {}
 }
 
-// 5. รายชื่อพิกัดประเทศ (ชุดที่พี่สาวต้องการ)
+// 5. รายชื่อพิกัดประเทศ (กลับมาแล้วค่ะ!)
 async function fetchLocation() {
     if (isLocationLoaded) return;
     try {
@@ -75,7 +79,8 @@ async function fetchLocation() {
 // 6. ระบบ Pop
 function pop(e) {
     if (e) e.preventDefault();
-    popSound.cloneNode().play().catch(()=>{});
+    const playPop = popSound.cloneNode(); 
+    playPop.play().catch(err => {});
     count++;
     scoreDisplay.innerText = count.toLocaleString();
     cat.src = "Pop02.png"; 
@@ -86,11 +91,16 @@ function pop(e) {
     }
 }
 
+function unpop(e) {
+    if (e) e.preventDefault();
+    cat.src = "Pop01.jpeg"; 
+}
+
 // 7. ส่งข้อมูลไป Supabase
 async function logPlayerInfo() {
     if (!playerLocation) return;
     try {
-        const { data } = await _supabase.from('locations').select('score').eq('country', playerLocation.country).maybeSingle();
+        const { data } = await _supabase.from('locations').select('score').eq('country', playerLocation.country).single();
         let currentScore = data ? data.score : 0;
 
         await _supabase.from('locations').upsert({ 
@@ -142,11 +152,10 @@ function toggleViewAll() {
 }
 
 cat.addEventListener('mousedown', pop);
-cat.addEventListener('mouseup', () => cat.src = "Pop01.jpeg");
+cat.addEventListener('mouseup', unpop);
 cat.addEventListener('touchstart', pop, {passive: false});
-cat.addEventListener('touchend', () => cat.src = "Pop01.jpeg", {passive: false});
+cat.addEventListener('touchend', unpop, {passive: false});
 
-initMap(); fetchLocation(); setInterval(updateLeaderboard, 4000);
-
-
-
+initMap();
+fetchLocation();
+setInterval(updateLeaderboard, 4000);
