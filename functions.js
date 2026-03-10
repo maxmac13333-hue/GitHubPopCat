@@ -1,3 +1,4 @@
+// --- การตั้งค่าพื้นฐาน ---
 const cat = document.getElementById('cat');
 const scoreDisplay = document.getElementById('score');
 const popSound = document.getElementById('pop-sound');
@@ -7,7 +8,7 @@ let isLocationLoaded = false;
 let map;
 let showAll = false;
 
-// 1. เชื่อมต่อ Supabase (Cloud Database)
+// 1. เชื่อมต่อ Supabase
 const SUPABASE_URL = 'https://rtfltqeakqlyicygbjrn.supabase.co'; 
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0Zmx0cWVha3FseWljeWdianJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNzA2NTksImV4cCI6MjA4ODY0NjY1OX0.OBCd3GW9TMqSzWWhGDpmQeypn8OnrhXzbGtbpKNwMyg'; 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -18,7 +19,7 @@ function initMap() {
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 }
 
-// 3. ปักหมุด
+// 3. ปักหมุดบนแผนที่
 function addPopMarker(lat, lon, isOther = false) {
     if(!map) return;
     const marker = L.circleMarker([lat, lon], {
@@ -29,7 +30,7 @@ function addPopMarker(lat, lon, isOther = false) {
     setTimeout(() => map.removeLayer(marker), 1000);
 }
 
-// 4. ดึงข้อมูลพิกัดคนอื่น
+// 4. ดึงข้อมูลพิกัดล่าสุด (จากคนอื่น)
 async function fetchRealClicks() {
     try {
         const { data } = await _supabase.from('locations').select('lat, lon').limit(10);
@@ -41,19 +42,17 @@ async function fetchRealClicks() {
     } catch (e) {}
 }
 
-// 5. รายชื่อพิกัดประเทศ (กลับมาแล้วค่ะ!)
-// 5. รายชื่อพิกัดประเทศ (จำลอง 20 ประเทศ)
+// 5. ดึง IP และพิกัด (ดึงครั้งเดียว)
 async function fetchLocation() {
     if (isLocationLoaded) return;
     try {
-        const ipRes = await fetch('https://ipapi.co/json/');
-        const realData = await ipRes.json();
+        // ใช้ API ตัวที่เสถียรและไม่ค่อยติด CORS
+        const res = await fetch('https://api.db-ip.com/v2/free/self');
+        const realData = await res.json();
 
-        // ตรวจสอบว่า IP ดึงมาได้จริงไหม
-        if(!realData.ip) throw new Error("IP fetch failed");
-
+        // รายชื่อประเทศจำลอง 20 ประเทศ
         const countryCenters = [
-            { ip_address: realData.ip, country: realData.country_name, country_code: realData.country_code, lat: realData.latitude, lon: realData.longitude },
+            { ip_address: realData.ipAddress, country: realData.countryName, country_code: realData.countryCode, lat: 13.75, lon: 100.5 },
             { ip_address: "1.160.0.0", country: "Taiwan", country_code: "TW", lat: 23.6978, lon: 120.9605 },
             { ip_address: "1.64.0.0", country: "Hong Kong", country_code: "HK", lat: 22.3193, lon: 114.1694 },
             { ip_address: "1.21.0.0", country: "Japan", country_code: "JP", lat: 36.2048, lon: 138.2529 },
@@ -87,18 +86,19 @@ async function fetchLocation() {
         map.setView([playerLocation.lat, playerLocation.lon], 4); 
         updateLeaderboard();
         setInterval(fetchRealClicks, 3000); 
-    } catch (e) { 
-        console.error("Location fail", e);
-        document.getElementById('ip-display').innerText = "เชื่อมต่อ IP ไม่สำเร็จ กรุณาลองใหม่";
+    } catch (e) {
+        console.error("Location failed, using fallback.");
+        isLocationLoaded = true;
+        updateLeaderboard();
     }
 }
 
-// 6. ระบบ Pop (แก้ไขจุดที่ทำให้ปากไม่ขยับ)
+// 6. ระบบ Pop (ปากขยับ)
 function pop(e) {
     if (e) e.preventDefault();
     
-    // ปากขยับ: เปลี่ยนรูปทันที
-    cat.src = "Pop02.png"; 
+    // เปลี่ยนเป็น Pop02.jpeg (ปากเปิด)
+    cat.src = "Pop02.jpeg"; 
 
     const playPop = popSound.cloneNode(); 
     playPop.play().catch(err => {});
@@ -114,12 +114,7 @@ function pop(e) {
 
 function unpop(e) {
     if (e) e.preventDefault();
-    // กลับเป็นรูปเดิมเมื่อปล่อยนิ้ว/เมาส์
-    cat.src = "Pop01.jpeg"; 
-}
-
-function unpop(e) {
-    if (e) e.preventDefault();
+    // กลับเป็น Pop01.jpeg (ปากปิด)
     cat.src = "Pop01.jpeg"; 
 }
 
@@ -127,7 +122,7 @@ function unpop(e) {
 async function logPlayerInfo() {
     if (!playerLocation) return;
     try {
-        const { data } = await _supabase.from('locations').select('score').eq('country', playerLocation.country).single();
+        const { data } = await _supabase.from('locations').select('score').eq('country', playerLocation.country).maybeSingle();
         let currentScore = data ? data.score : 0;
 
         await _supabase.from('locations').upsert({ 
@@ -140,7 +135,7 @@ async function logPlayerInfo() {
     } catch (err) {}
 }
 
-// 8. อัปเดต Leaderboard
+// 8. อัปเดต Leaderboard (20 อันดับ)
 async function updateLeaderboard() {
     const listDiv = document.getElementById('leaderboard-list');
     const myRankDiv = document.getElementById('my-rank-box');
@@ -155,6 +150,8 @@ async function updateLeaderboard() {
                 <span>${index + 1}. <img src="${flagUrl}" width="20"> ${item.country}</span>
                 <span class="rank-score">${parseInt(item.score).toLocaleString()}</span>
             </div>`;
+            
+            // แสดงผลตามโหมด (Top 10 หรือ All 20)
             if (showAll || index < 10) listDiv.innerHTML += rowHtml;
 
             if (playerLocation && item.country === playerLocation.country) {
@@ -178,13 +175,13 @@ function toggleViewAll() {
     updateLeaderboard();
 }
 
+// Event Listeners
 cat.addEventListener('mousedown', pop);
 cat.addEventListener('mouseup', unpop);
 cat.addEventListener('touchstart', pop, {passive: false});
 cat.addEventListener('touchend', unpop, {passive: false});
 
+// เริ่มต้นระบบ
 initMap();
 fetchLocation();
 setInterval(updateLeaderboard, 4000);
-
-
