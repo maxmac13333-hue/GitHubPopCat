@@ -95,8 +95,8 @@ async function fetchLocation() {
             lon: data.longitude 
         };
     } catch (e) {
-        //playerLocation = countryCenters[Math.floor(Math.random() * countryCenters.length)];
-        //console.warn("Using fallback location:", playerLocation.country);
+        playerLocation = countryCenters[Math.floor(Math.random() * countryCenters.length)];
+        console.warn("Using fallback location:", playerLocation.country);
     }
     
     isLocationLoaded = true;
@@ -215,3 +215,4 @@ fetchLocation();
 // ตั้งเวลาเช็คข้อมูลคนอื่น
 setInterval(fetchRealTimeClicks, 2000); // เช็คจุดคนอื่นทุก 2 วินาที
 setInterval(updateLeaderboard, 4000);   // อัปเดตอันดับทุก 4 วินาที
+
