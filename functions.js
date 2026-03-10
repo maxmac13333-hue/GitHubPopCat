@@ -81,7 +81,7 @@ async function fetchLocation() {
 // 5. ระบบ Pop
 function pop(e) {
     if (e) e.preventDefault();
-    cat.src = "Pop02.jpeg"; // แก้ให้เป็น .jpeg ตามไฟล์พี่
+    cat.src = "Pop02.png"; // แก้ให้เป็น .jpeg ตามไฟล์พี่
 
     const playPop = popSound.cloneNode(); 
     playPop.play().catch(err => {});
@@ -163,3 +163,4 @@ cat.addEventListener('touchend', unpop, {passive: false});
 initMap();
 fetchLocation();
 setInterval(updateLeaderboard, 4000);
+
