@@ -124,7 +124,6 @@ async function pop(e) {
     count++;
     scoreDisplay.innerText = count.toLocaleString();
     
-    // เปลี่ยนรูปแมว (ต้องมีไฟล์ Pop02.png ในโฟลเดอร์นะคะ)
     cat.src = "Pop02.jpeg"; 
 
     // ปักหมุดสีทองตรงที่ของเรา
@@ -227,4 +226,5 @@ fetchLocation();
 // ตั้งเวลาเช็คข้อมูลคนอื่น
 setInterval(fetchRealTimeClicks, 2000); // เช็คจุดคนอื่นทุก 2 วินาที
 setInterval(updateLeaderboard, 4000);   // อัปเดตอันดับทุก 4 วินาที
+
 
