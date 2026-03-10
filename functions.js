@@ -97,8 +97,7 @@ async function fetchLocation() {
 function pop(e) {
     if (e) e.preventDefault();
     
-    // เปลี่ยนเป็น Pop02.jpeg (ปากเปิด)
-    cat.src = "Pop02.jpeg"; 
+    cat.src = "Pop02.png"; 
 
     const playPop = popSound.cloneNode(); 
     playPop.play().catch(err => {});
@@ -185,3 +184,4 @@ cat.addEventListener('touchend', unpop, {passive: false});
 initMap();
 fetchLocation();
 setInterval(updateLeaderboard, 4000);
+
