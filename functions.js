@@ -95,9 +95,10 @@ async function fetchLocation() {
             lon: data.longitude 
         };
     } catch (e) {
-        playerLocation = countryCenters[Math.floor(Math.random() * countryCenters.length)];
-        console.warn("Using fallback location:", playerLocation.country);
+
     }
+    //playerLocation = countryCenters[Math.floor(Math.random() * countryCenters.length)];
+    //console.warn("Using fallback location:", playerLocation.country);
     
     isLocationLoaded = true;
     const flagUrl = `https://flagcdn.com/w40/${playerLocation.country_code.toLowerCase()}.png`;
@@ -197,8 +198,18 @@ async function updateLeaderboard() {
 function toggleViewAll() {
     showAll = !showAll;
     const btn = document.querySelector('.view-all-btn');
-    btn.innerText = showAll ? "แสดงแค่ Top 10 △" : "ดูอันดับทั้งหมด ▽";
-    updateLeaderboard();
+    const listDiv = document.getElementById('leaderboard-list');
+
+    if (showAll) {
+        btn.innerText = "แสดงแค่ Top 10 △";
+        listDiv.classList.add('show-scrollbar'); // เปิดลูกเลื่อน
+    } else {
+        btn.innerText = "ดูอันดับทั้งหมด ▽";
+        listDiv.classList.remove('show-scrollbar'); // ปิดลูกเลื่อน
+        listDiv.scrollTop = 0; // เลื่อนกลับไปบนสุด
+    }
+    
+    updateLeaderboard(); // สั่งวาดอันดับใหม่
 }
 
 // --- 7. Event Listeners และการเริ่มงาน (ย้ายมาไว้ล่างสุด) ---
@@ -215,4 +226,3 @@ fetchLocation();
 // ตั้งเวลาเช็คข้อมูลคนอื่น
 setInterval(fetchRealTimeClicks, 2000); // เช็คจุดคนอื่นทุก 2 วินาที
 setInterval(updateLeaderboard, 4000);   // อัปเดตอันดับทุก 4 วินาที
-
