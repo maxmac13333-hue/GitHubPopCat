@@ -1,128 +1,95 @@
-/* 1. จัดระเบียบพื้นฐานและแก้ปัญหาจอมือถือ */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    -webkit-tap-highlight-color: transparent; /* ลบสีฟ้าเวลาจิ้มบนมือถือ */
+body { 
+    margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; 
+    background-color: #bfa482; font-family: 'Arial Black', sans-serif; 
+    user-select: none; overflow: hidden; touch-action: manipulation; height: 100vh; 
 }
 
-body {
-    width: 100vw;
-    height: 100vh;
-    height: -webkit-fill-available; /* แก้ปัญหา Safari มือถือ */
-    font-family: 'Arial', sans-serif;
-    background-color: #b5e2ff; /* สีฟ้า PopCat ที่พี่ชอบ */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow: hidden; /* ห้ามเลื่อนจอไปมา */
-    position: relative;
+/* 🚩 กล่อง Sidebar ซ้าย - ขยายกว้างขึ้นนิดหน่อยรองรับตัวหนังสือใหญ่ */
+#leaderboard-box { 
+    position: absolute; top: 20px; left: 20px; 
+    width: 460px; /* 👈 ขยายจาก 400px เป็น 460px */
+    background: rgba(0,0,0,0.9); color: white; padding: 25px; border-radius: 25px;
+    z-index: 100; border: 4px solid gold; box-shadow: 0 0 30px rgba(255, 215, 0, 0.5); 
+    display: flex; flex-direction: column;
 }
 
-/* 2. ส่วนหัว (ตัวเลขคะแนน) - ปรับให้ลอยและขยายตามจอ */
-.header {
-    position: absolute;
-    top: 5vh;
-    z-index: 10;
-    text-align: center;
-    pointer-events: none; /* เพื่อให้จิ้มแมวทะลุตัวเลขได้ */
+#map-wrapper { width: 100%; margin-bottom: 20px; }
+#map { width: 100%; height: 320px; border-radius: 15px; border: 2.5px solid gold; }
+
+/* หัวข้อ Ranking ใหญ่ขึ้น */
+#leaderboard-box h3 { 
+    margin: 15px 0; text-align: center; color: gold; 
+    font-size: 32px; /* 👈 ใหญ่ขึ้นชัดเจน */
+    text-transform: uppercase;
 }
 
-.header h1 {
-    color: white;
-    font-size: 1.2rem;
-    text-shadow: 2px 2px 0 #000;
-    margin-bottom: 5px;
-    opacity: 0.8;
-}
-
-#score {
-    font-size: clamp(3.5rem, 15vw, 7rem); /* ตัวเลขใหญ่เต็มตาแต่ไม่ล้นจอ */
-    font-weight: bold;
-    color: white;
-    text-shadow: 4px 4px 0 #000;
-    line-height: 1;
-}
-
-/* 3. ส่วนของแมว - แก้ปัญหารูปแบน (หัวใจสำคัญ!) */
-.cat-container {
-    width: 100%;
-    flex-grow: 1; /* กินพื้นที่ที่เหลือทั้งหมด */
-    display: flex;
-    align-items: flex-end; /* ให้แมวนั่งอยู่ขอบล่างของจอพอดี */
-    justify-content: center;
-    padding-bottom: 0;
-}
-
-#cat {
-    height: 75vh; /* บังคับความสูง 75% ของจอ */
-    width: auto;   /* ปล่อยความกว้างปรับตามสัดส่วนภาพจริง (กันรูปแบน) */
-    max-width: 100%;
-    object-fit: contain; /* ป้องกันภาพเสียรูปทรง */
-    cursor: pointer;
-    user-select: none;
-    -webkit-user-drag: none;
-    transition: transform 0.05s ease-out;
-}
-
-#cat:active {
-    transform: scale(0.95); /* เอฟเฟกต์ตอนจิ้มให้ดูนุ่มนวล */
-}
-
-/* 4. กล่อง Leaderboard (ปรับตามรูปที่พี่สาวส่งมา) */
-#leaderboard-box {
-    position: fixed;
-    top: 15px;
-    left: 15px;
-    width: clamp(160px, 25vw, 240px);
-    background: rgba(255, 255, 255, 0.9);
-    padding: 10px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-    z-index: 100;
-}
-
-#leaderboard-box h3 {
-    font-size: 0.9rem;
-    margin-bottom: 8px;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 5px;
-    color: #333;
-}
-
+/* 🚩 รายชื่อประเทศในตาราง - ขยายใหญ่สะใจ */
 #leaderboard-list {
-    max-height: 20vh;
-    overflow-y: auto;
-    font-size: 0.85rem;
+    height: 550px; overflow-y: hidden; 
+    font-family: 'Arial', sans-serif; 
+    font-size: 26px; /* 👈 จาก 16px เป็น 26px อ่านง่ายสุดๆ */
+    scrollbar-gutter: stable; padding-right: 15px; box-sizing: border-box;
+}
+.show-scrollbar { overflow-y: auto !important; }
+
+/* ลูกเลื่อนทอง */
+#leaderboard-list::-webkit-scrollbar { width: 12px; }
+#leaderboard-list::-webkit-scrollbar-thumb { 
+    background: gold; border-radius: 10px; border: 2px solid transparent; background-clip: padding-box; 
 }
 
-/* 5. แถบ IP และข้อมูลด้านล่าง */
-#ip-display {
-    position: fixed;
-    bottom: 10px;
-    right: 15px;
-    background: rgba(0, 0, 0, 0.5);
-    color: white;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 0.7rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-/* 6. แผนที่ในกล่องอันดับ (ถ้าพี่เว้นไว้) */
-#map {
-    width: 100%;
-    height: 100px;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    background: #eee;
-}
-
-/* สไตล์แถวในอันดับ */
 .rank-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 3px 0;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 0; border-bottom: 2px solid rgba(255,255,255,0.1);
+}
+
+/* 🚩 ตัวเลขคะแนนสีเขียว */
+.rank-score { 
+    color: #00ff00; font-family: 'Courier New', monospace; 
+    font-weight: bold; font-size: 24px; /* 👈 ขยายตัวเลขคะแนน */
+}
+
+/* 🚩 ปุ่มดูทั้งหมด */
+.view-all-btn {
+    background: gold; border: none; color: black; padding: 15px; 
+    cursor: pointer; font-size: 18px; font-weight: bold; margin: 15px 0; border-radius: 12px;
+}
+
+/* 🚩 กล่อง "อันดับของคุณ" ด้านล่าง */
+#my-rank-box {
+    border-top: 4px solid gold; background: rgba(255, 215, 0, 0.3); 
+    border-radius: 0 0 25px 25px; margin: 0 -25px -25px -25px; 
+    padding: 20px 25px; font-size: 24px; /* 👈 อันดับเราก็ต้องใหญ่ */
+}
+
+/* 🚩 ส่วนหัว (คะแนนหลัก) */
+.header { 
+    margin-top: 5vh; text-align: center; width: 100%; 
+    padding-left: 480px; /* 👈 ขยับหลบกล่องซ้ายที่กว้างขึ้น */
+    box-sizing: border-box; z-index: 10;
+}
+h1 { font-size: 50px; color: white; -webkit-text-stroke: 2px black; margin: 0; }
+#score { 
+    font-size: 130px; /* 👈 ตัวเลขคะแนนใหญ่ยักษ์ */
+    color: white; -webkit-text-stroke: 3px black; 
+    filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
+}
+
+/* 🚩 น้องแมวเต็มจอ */
+.cat-container { 
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+    display: flex; justify-content: center; align-items: flex-end; z-index: 1;
+}
+#cat { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
+
+/* 🚩 IP Display ขวาบน (ธง + ชื่อประเทศ + IP) - ขยายใหญ่พิเศษ */
+#ip-display {
+    position: absolute; top: 20px; right: 30px; 
+    background: rgba(0,0,0,0.85); color: #00ff00; 
+    padding: 15px 25px; border-radius: 50px; 
+    font-size: 24px; /* 👈 ใหญ่มาก เห็นชัดถึงหน้าปากซอย */
+    border: 3px solid #00ff00; z-index: 1000; 
+    display: flex; align-items: center; gap: 15px;
+    font-family: 'Courier New', monospace; font-weight: bold;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
 }
