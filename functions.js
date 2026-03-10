@@ -54,8 +54,6 @@ async function fetchLocation() {
             { ip_address: "1.1.1.1", country: "Australia", country_code: "AU", lat: -25.27, lon: 133.77 },
             { ip_address: "31.13.64.1", country: "United Kingdom", country_code: "GB", lat: 55.37, lon: -3.43 },
             { ip_address: "185.129.61.1", country: "Germany", country_code: "DE", lat: 51.16, lon: 10.45 },
-            ]
-
         ];
 
         playerLocation = countryCenters[0];
@@ -165,3 +163,4 @@ cat.addEventListener('touchend', unpop, {passive: false});
 initMap();
 fetchLocation();
 setInterval(updateLeaderboard, 4000);
+
