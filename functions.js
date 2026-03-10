@@ -42,11 +42,15 @@ async function fetchRealClicks() {
 }
 
 // 5. รายชื่อพิกัดประเทศ (กลับมาแล้วค่ะ!)
+// 5. รายชื่อพิกัดประเทศ (จำลอง 20 ประเทศ)
 async function fetchLocation() {
     if (isLocationLoaded) return;
     try {
         const ipRes = await fetch('https://ipapi.co/json/');
         const realData = await ipRes.json();
+
+        // ตรวจสอบว่า IP ดึงมาได้จริงไหม
+        if(!realData.ip) throw new Error("IP fetch failed");
 
         const countryCenters = [
             { ip_address: realData.ip, country: realData.country_name, country_code: realData.country_code, lat: realData.latitude, lon: realData.longitude },
@@ -54,6 +58,16 @@ async function fetchLocation() {
             { ip_address: "1.64.0.0", country: "Hong Kong", country_code: "HK", lat: 22.3193, lon: 114.1694 },
             { ip_address: "1.21.0.0", country: "Japan", country_code: "JP", lat: 36.2048, lon: 138.2529 },
             { ip_address: "1.214.0.0", country: "South Korea", country_code: "KR", lat: 35.9078, lon: 127.7669 },
+            { ip_address: "8.8.8.8", country: "USA", country_code: "US", lat: 37.0902, lon: -95.7129 },
+            { ip_address: "1.1.1.1", country: "Australia", country_code: "AU", lat: -25.2744, lon: 133.7751 },
+            { ip_address: "31.13.64.1", country: "United Kingdom", country_code: "GB", lat: 55.3781, lon: -3.4360 },
+            { ip_address: "185.129.61.1", country: "Germany", country_code: "DE", lat: 51.1657, lon: 10.4515 },
+            { ip_address: "185.129.62.1", country: "France", country_code: "FR", lat: 46.2276, lon: 2.2137 },
+            { ip_address: "185.129.63.1", country: "Italy", country_code: "IT", lat: 41.8719, lon: 12.5674 },
+            { ip_address: "201.217.20.1", country: "Brazil", country_code: "BR", lat: -14.2350, lon: -51.9253 },
+            { ip_address: "202.141.240.1", country: "Singapore", country_code: "SG", lat: 1.3521, lon: 103.8198 },
+            { ip_address: "202.184.0.1", country: "Malaysia", country_code: "MY", lat: 4.2105, lon: 101.9758 },
+            { ip_address: "203.215.114.1", country: "Vietnam", country_code: "VN", lat: 14.0583, lon: 108.2772 },
             { ip_address: "2.16.104.0", country: "Finland", country_code: "FI", lat: 61.9241, lon: 25.7482 },
             { ip_address: "2.16.176.0", country: "Sweden", country_code: "SE", lat: 60.1282, lon: 18.6435 },
             { ip_address: "2.16.216.0", country: "Norway", country_code: "NO", lat: 60.4720, lon: 8.4689 },
@@ -73,22 +87,35 @@ async function fetchLocation() {
         map.setView([playerLocation.lat, playerLocation.lon], 4); 
         updateLeaderboard();
         setInterval(fetchRealClicks, 3000); 
-    } catch (e) { console.error("Location fail", e); }
+    } catch (e) { 
+        console.error("Location fail", e);
+        document.getElementById('ip-display').innerText = "เชื่อมต่อ IP ไม่สำเร็จ กรุณาลองใหม่";
+    }
 }
 
-// 6. ระบบ Pop
+// 6. ระบบ Pop (แก้ไขจุดที่ทำให้ปากไม่ขยับ)
 function pop(e) {
     if (e) e.preventDefault();
-    const playPop = popSound.cloneNode(); 
-    playPop.play().catch(err => {});
-    count++;
-    scoreDisplay.innerText = count.toLocaleString();
+    
+    // ปากขยับ: เปลี่ยนรูปทันที
     cat.src = "Pop02.png"; 
 
+    const playPop = popSound.cloneNode(); 
+    playPop.play().catch(err => {});
+    
+    count++;
+    scoreDisplay.innerText = count.toLocaleString();
+
     if(playerLocation) {
-        addPopMarker(playerLocation.lat, playerLocation.lon, false); // <--- บรรทัดนี้แหละตัวการ!
+        addPopMarker(playerLocation.lat, playerLocation.lon, false);
         logPlayerInfo();
     }
+}
+
+function unpop(e) {
+    if (e) e.preventDefault();
+    // กลับเป็นรูปเดิมเมื่อปล่อยนิ้ว/เมาส์
+    cat.src = "Pop01.jpeg"; 
 }
 
 function unpop(e) {
@@ -159,4 +186,5 @@ cat.addEventListener('touchend', unpop, {passive: false});
 initMap();
 fetchLocation();
 setInterval(updateLeaderboard, 4000);
+
 
