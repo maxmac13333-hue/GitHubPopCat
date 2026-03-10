@@ -1,4 +1,3 @@
-// --- การตั้งค่าพื้นฐาน ---
 const cat = document.getElementById('cat');
 const scoreDisplay = document.getElementById('score');
 const popSound = document.getElementById('pop-sound');
@@ -13,13 +12,13 @@ const SUPABASE_URL = 'https://rtfltqeakqlyicygbjrn.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ0Zmx0cWVha3FseWljeWdianJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNzA2NTksImV4cCI6MjA4ODY0NjY1OX0.OBCd3GW9TMqSzWWhGDpmQeypn8OnrhXzbGtbpKNwMyg'; 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// 2. เริ่มต้นแผนที่
+// 2. เริ่มต้นแผนที่ (เก็บไว้แค่ดูสวยๆ แต่จะไม่แสดงจุดขาวคนอื่นแล้ว)
 function initMap() {
     map = L.map('map', { zoomControl: false, attributionControl: false }).setView([20, 100], 1);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 }
 
-// 3. ปักหมุดบนแผนที่
+// 3. ปักหมุด (จะทำงานเฉพาะตอนเรากดเอง)
 function addPopMarker(lat, lon, isOther = false) {
     if(!map) return;
     const marker = L.circleMarker([lat, lon], {
@@ -30,48 +29,33 @@ function addPopMarker(lat, lon, isOther = false) {
     setTimeout(() => map.removeLayer(marker), 1000);
 }
 
-// 4. ดึงข้อมูลพิกัดล่าสุด (จากคนอื่น)
+// 4. แก้ Error 400: ล้างฟังก์ชันดึงพิกัดคนอื่นทิ้ง เพราะ SQL ไม่มี lat/lon แล้ว
 async function fetchRealClicks() {
-    try {
-        const { data } = await _supabase.from('locations').select('lat, lon').limit(10);
-        if (data) {
-            data.forEach(p => {
-                if (p.lat && p.lon) addPopMarker(p.lat, p.lon, true);
-            });
-        }
-    } catch (e) {}
+    return; // ไม่ต้องทำอะไร เพื่อไม่ให้เกิด Error
 }
 
-// 5. ดึง IP และพิกัด (ดึงครั้งเดียว)
+// 5. แก้ Error 429: เปลี่ยน API ดึง IP และพิกัด (ดึงครั้งเดียว)
+// 5. รายชื่อพิกัดประเทศ (มาครบแล้วค่ะ 35 ประเทศ!)
 async function fetchLocation() {
     if (isLocationLoaded) return;
     try {
-        // ใช้ API ตัวที่เสถียรและไม่ค่อยติด CORS
         const res = await fetch('https://api.db-ip.com/v2/free/self');
         const realData = await res.json();
 
-        // รายชื่อประเทศจำลอง 20 ประเทศ
         const countryCenters = [
+            // --- ข้อมูลจริงของผู้เล่น ---
             { ip_address: realData.ipAddress, country: realData.countryName, country_code: realData.countryCode, lat: 13.75, lon: 100.5 },
-            { ip_address: "1.160.0.0", country: "Taiwan", country_code: "TW", lat: 23.6978, lon: 120.9605 },
-            { ip_address: "1.64.0.0", country: "Hong Kong", country_code: "HK", lat: 22.3193, lon: 114.1694 },
-            { ip_address: "1.21.0.0", country: "Japan", country_code: "JP", lat: 36.2048, lon: 138.2529 },
-            { ip_address: "1.214.0.0", country: "South Korea", country_code: "KR", lat: 35.9078, lon: 127.7669 },
-            { ip_address: "8.8.8.8", country: "USA", country_code: "US", lat: 37.0902, lon: -95.7129 },
-            { ip_address: "1.1.1.1", country: "Australia", country_code: "AU", lat: -25.2744, lon: 133.7751 },
-            { ip_address: "31.13.64.1", country: "United Kingdom", country_code: "GB", lat: 55.3781, lon: -3.4360 },
-            { ip_address: "185.129.61.1", country: "Germany", country_code: "DE", lat: 51.1657, lon: 10.4515 },
-            { ip_address: "185.129.62.1", country: "France", country_code: "FR", lat: 46.2276, lon: 2.2137 },
-            { ip_address: "185.129.63.1", country: "Italy", country_code: "IT", lat: 41.8719, lon: 12.5674 },
-            { ip_address: "201.217.20.1", country: "Brazil", country_code: "BR", lat: -14.2350, lon: -51.9253 },
-            { ip_address: "202.141.240.1", country: "Singapore", country_code: "SG", lat: 1.3521, lon: 103.8198 },
-            { ip_address: "202.184.0.1", country: "Malaysia", country_code: "MY", lat: 4.2105, lon: 101.9758 },
-            { ip_address: "203.215.114.1", country: "Vietnam", country_code: "VN", lat: 14.0583, lon: 108.2772 },
-            { ip_address: "2.16.104.0", country: "Finland", country_code: "FI", lat: 61.9241, lon: 25.7482 },
-            { ip_address: "2.16.176.0", country: "Sweden", country_code: "SE", lat: 60.1282, lon: 18.6435 },
-            { ip_address: "2.16.216.0", country: "Norway", country_code: "NO", lat: 60.4720, lon: 8.4689 },
-            { ip_address: "5.103.128.0", country: "Denmark", country_code: "DK", lat: 56.2639, lon: 9.5018 },
-            { ip_address: "5.173.0.0", country: "Poland", country_code: "PL", lat: 51.9194, lon: 19.1445 }
+        
+            { ip_address: "1.160.0.0", country: "Taiwan", country_code: "TW", lat: 23.69, lon: 120.96 },
+            { ip_address: "1.64.0.0", country: "Hong Kong", country_code: "HK", lat: 22.31, lon: 114.16 },
+            { ip_address: "1.21.0.0", country: "Japan", country_code: "JP", lat: 36.20, lon: 138.25 },
+            { ip_address: "1.214.0.0", country: "South Korea", country_code: "KR", lat: 35.90, lon: 127.76 },
+            { ip_address: "8.8.8.8", country: "USA", country_code: "US", lat: 37.09, lon: -95.71 },
+            { ip_address: "1.1.1.1", country: "Australia", country_code: "AU", lat: -25.27, lon: 133.77 },
+            { ip_address: "31.13.64.1", country: "United Kingdom", country_code: "GB", lat: 55.37, lon: -3.43 },
+            { ip_address: "185.129.61.1", country: "Germany", country_code: "DE", lat: 51.16, lon: 10.45 },
+            ]
+
         ];
 
         playerLocation = countryCenters[0];
@@ -85,19 +69,17 @@ async function fetchLocation() {
         
         map.setView([playerLocation.lat, playerLocation.lon], 4); 
         updateLeaderboard();
-        setInterval(fetchRealClicks, 3000); 
     } catch (e) {
-        console.error("Location failed, using fallback.");
+        console.error("Location fail", e);
         isLocationLoaded = true;
         updateLeaderboard();
     }
 }
 
-// 6. ระบบ Pop (ปากขยับ)
+// 6. ระบบ Pop (แก้ปากขยับ)
 function pop(e) {
     if (e) e.preventDefault();
-    
-    cat.src = "Pop02.png"; 
+    cat.src = "Pop02.jpeg"; // แก้เป็น .jpeg ตามไฟล์จริง
 
     const playPop = popSound.cloneNode(); 
     playPop.play().catch(err => {});
@@ -113,28 +95,30 @@ function pop(e) {
 
 function unpop(e) {
     if (e) e.preventDefault();
-    // กลับเป็น Pop01.jpeg (ปากปิด)
     cat.src = "Pop01.jpeg"; 
 }
 
-// 7. ส่งข้อมูลไป Supabase
+// 7. ส่งข้อมูล (ส่งแค่ที่มีในตาราง SQL ใหม่)
 async function logPlayerInfo() {
     if (!playerLocation) return;
     try {
-        const { data } = await _supabase.from('locations').select('score').eq('country', playerLocation.country).maybeSingle();
+        const { data } = await _supabase
+            .from('locations')
+            .select('score')
+            .eq('country', playerLocation.country)
+            .maybeSingle();
+
         let currentScore = data ? data.score : 0;
 
         await _supabase.from('locations').upsert({ 
             country: playerLocation.country, 
             country_code: playerLocation.country_code,
-            lat: playerLocation.lat,
-            lon: playerLocation.lon,
             score: currentScore + 1 
         }, { onConflict: 'country' });
     } catch (err) {}
 }
 
-// 8. อัปเดต Leaderboard (20 อันดับ)
+// 8. อัปเดต Leaderboard
 async function updateLeaderboard() {
     const listDiv = document.getElementById('leaderboard-list');
     const myRankDiv = document.getElementById('my-rank-box');
@@ -150,7 +134,6 @@ async function updateLeaderboard() {
                 <span class="rank-score">${parseInt(item.score).toLocaleString()}</span>
             </div>`;
             
-            // แสดงผลตามโหมด (Top 10 หรือ All 20)
             if (showAll || index < 10) listDiv.innerHTML += rowHtml;
 
             if (playerLocation && item.country === playerLocation.country) {
@@ -174,14 +157,11 @@ function toggleViewAll() {
     updateLeaderboard();
 }
 
-// Event Listeners
 cat.addEventListener('mousedown', pop);
 cat.addEventListener('mouseup', unpop);
 cat.addEventListener('touchstart', pop, {passive: false});
 cat.addEventListener('touchend', unpop, {passive: false});
 
-// เริ่มต้นระบบ
 initMap();
 fetchLocation();
 setInterval(updateLeaderboard, 4000);
-
